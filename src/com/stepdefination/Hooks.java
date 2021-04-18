@@ -1,26 +1,30 @@
 package com.stepdefination;
 
+import com.base.DriverManager;
+import com.base.TestConfiguration;
 import com.base.TestContext;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
 
 public class Hooks {
-    private TestContext testContext;
+    private DriverManager driverManager;
+    private TestConfiguration testConfiguration;
 
     public Hooks(TestContext testContext) {
-        this.testContext=testContext;
+        driverManager=(DriverManager)testContext;
+        testConfiguration=(TestConfiguration)testContext;
     }
 
     @After
     public void tearDown(Scenario scenario) throws Exception{
         try {
-            testContext.getWebDriverManager().getScreenshot(scenario,testContext.getTestConfiguration().getUdid());
+            driverManager.getScreenshot(scenario,testConfiguration.getUdid());
         }
         catch (Exception e){
             e.printStackTrace();
         }
         try {
-            testContext.getWebDriverManager().quitDriver();
+            driverManager.quitDriver();
         }catch (Exception e){
             e.printStackTrace();
         }

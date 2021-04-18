@@ -22,20 +22,14 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
-public class driverManager {
+public class DriverManager extends TestConfiguration {
     public WebDriver driver;
     public Boolean serverStarted  = false;
     public String dummyText;
     private String LOCAL_DIRECTORY_SOURCE = System.getProperty("user.dir") + File.separator + "browserDrivers" + File.separator;
-    TestConfiguration configuration;
 
-    public driverManager(TestConfiguration testConfiguration) {
-        configuration= testConfiguration;
-    }
-
-
-    public WebDriver createDriver() throws Exception {
-        String browser = configuration.getBrowser();
+    public WebDriver getDriver() {
+        String browser = getBrowser();
         switch (browser.toLowerCase()) {
             case "firefox":
                 driver = new FirefoxDriver();
@@ -100,26 +94,26 @@ public class driverManager {
                 break;
             case "android":
                 if(!serverStarted){
-                    // System.out.println("port value is :" +configuration.getAppiumPort());
+                    // System.out.println("port value is :" +getAppiumPort());
 //                    AppiumServer server = new AppiumServer();
-//                    if(!server.checkIfServerIsRunnning(Integer.parseInt(configuration.getAppiumPort()))) {
-//                        server.startServer("127.0.0.1", Integer.parseInt(configuration.getAppiumPort()));
+//                    if(!server.checkIfServerIsRunnning(Integer.parseInt(getAppiumPort()))) {
+//                        server.startServer("127.0.0.1", Integer.parseInt(getAppiumPort()));
 //                    }
-//                    server.checkIfServerIsRunnning(Integer.parseInt(configuration.getAppiumPort()));
+//                    server.checkIfServerIsRunnning(Integer.parseInt(getAppiumPort()));
                     serverStarted = true;
                 }
                 DesiredCapabilities acapabilities = new DesiredCapabilities();
-                acapabilities.setCapability("deviceName", configuration.getDeviceName());
+                acapabilities.setCapability("deviceName", getDeviceName());
 
-                acapabilities.setCapability("udid", configuration.getUdid());
-                acapabilities.setCapability("systemPort",configuration.getSystemPort());
-                acapabilities.setCapability("platformVersion", configuration.getVersion());
-                acapabilities.setCapability("platformName", configuration.getBrowser());
-                acapabilities.setCapability("chromedriverPort",configuration.getChromeDriverPort());
-                acapabilities.setCapability("browserName", Integer.parseInt( configuration.getVersion()) >= 7 ? "Chrome" : "Browser");
+                acapabilities.setCapability("udid", getUdid());
+                acapabilities.setCapability("systemPort",getSystemPort());
+                acapabilities.setCapability("platformVersion", getVersion());
+                acapabilities.setCapability("platformName", getBrowser());
+                acapabilities.setCapability("chromedriverPort",getChromeDriverPort());
+                acapabilities.setCapability("browserName", Integer.parseInt( getVersion()) >= 7 ? "Chrome" : "Browser");
                 // acapabilities.setCapability(CapabilityType.BROWSER_NAME,"Browser");
-                acapabilities.setCapability("automationName", Integer.parseInt( configuration.getVersion()) >= 7 ? "UIAutomator2" : "UIAutomator1");
-                if (Integer.parseInt( configuration.getVersion()) >= 7) {
+                acapabilities.setCapability("automationName", Integer.parseInt( getVersion()) >= 7 ? "UIAutomator2" : "UIAutomator1");
+                if (Integer.parseInt( getVersion()) >= 7) {
                     acapabilities.setCapability("chromedriverExecutableDir", LOCAL_DIRECTORY_SOURCE);
                     ChromeOptions options = new ChromeOptions();
                     options.setExperimentalOption("w3c", false);
@@ -142,7 +136,7 @@ public class driverManager {
 //                    acapabilities.setCapability(ChromeOptions.CAPABILITY, options);
                 }
                 try {
-                    URL serverUrl = new URL("http://" + "127.0.0.1" + ":" + configuration.getAppiumPort() + "/wd/hub");
+                    URL serverUrl = new URL("http://" + "127.0.0.1" + ":" + getAppiumPort() + "/wd/hub");
                     driver = new AndroidDriver(serverUrl, acapabilities);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();

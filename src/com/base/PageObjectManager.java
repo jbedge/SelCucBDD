@@ -7,15 +7,15 @@ public class PageObjectManager {
 
     public WebDriver driver;
     private TestConfiguration testConfiguration;
+    private TestContext testContext;
 
-    public PageObjectManager(WebDriver driver,TestConfiguration configuration){
-        this.driver=driver;
-        this.testConfiguration=configuration;
+    public PageObjectManager(TestContext testContext){
+        this.testContext=testContext;
     }
 
     private LoginPage loginPage;
 
     public LoginPage getLoginPage(){
-        return (loginPage==null)?loginPage=new LoginPage(driver,testConfiguration):loginPage;
+        return (loginPage==null)?loginPage=new LoginPage(testContext):loginPage;
     }
 }

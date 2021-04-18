@@ -20,19 +20,20 @@ import java.util.concurrent.TimeUnit;
 
 
 public class ActionMethods  {
-    public WebDriver driverObj;
     private TestConfiguration testConfiguration;
     private String winHandleBefore;
+    private WebDriver driver;
+    private DriverManager driverManager;
 
 
-    public ActionMethods (WebDriver driver,TestConfiguration testConfiguration) {
-        this.driverObj = driver;
-        this.testConfiguration=testConfiguration;
+    public ActionMethods (TestContext testContext) {
+        driverManager=(DriverManager)testContext;
+        driver=driverManager.getDriver();
     }
     protected Logger logger = Logger.getLogger(this.getClass().getName());
 
     public void windowMinimize() throws Exception {
-        driverObj.manage().window().setPosition(new Point(-2000, 0));
+        driver.manage().window().setPosition(new Point(-2000, 0));
 
     }
 
@@ -47,17 +48,17 @@ public class ActionMethods  {
         }
     }
     public void quitDriver() {
-        driverObj.quit();
+        driver.quit();
     }
 
     public void closeDriver() {
-        driverObj.close();
+        driver.close();
     }
 
     public void goToUrl(String url) throws Exception {
         try {
             logger.info("goToUrl method execution started");
-            driverObj.get(url);
+            driver.get(url);
             waitForPageLoad();
             logger.info("goToUrl findBy method execution completed");
         } catch (Exception e) {
@@ -69,7 +70,7 @@ public class ActionMethods  {
     public void click(By locator) throws Exception {
         try {
             logger.info("Started Click method execution");
-            driverObj.findElement(locator).click();
+            driver.findElement(locator).click();
             logger.info("Successfully Clicked on Element - " + locator);
         } catch (Exception e) {
             logger.error("Failed to Click on Element - " + locator + e.getMessage());
@@ -84,13 +85,13 @@ public class ActionMethods  {
             {
                 try {
                     Thread.sleep(1000);
-                    driverObj.findElement(this.findBy(locator)).isDisplayed();
+                    driver.findElement(this.findBy(locator)).isDisplayed();
                     break;
                 } catch (Exception e) {
                 }
             }
 
-            driverObj.findElement(this.findBy(locator)).click();
+            driver.findElement(this.findBy(locator)).click();
             logger.info("Successfully Clicked on Element - " + locator);
         } catch (Exception e) {
             logger.error("Failed to Click on Element - " + locator + e.getMessage());
@@ -105,7 +106,7 @@ public class ActionMethods  {
                 waitOnlocator(locator);
             }catch (Exception e){}
             scrollDown(locator);
-            driverObj.findElement(this.findBy(locator)).click();
+            driver.findElement(this.findBy(locator)).click();
             waitForPageLoad();
             logger.info("Successfully Clicked on Element - " + locator);
         } catch (Exception e) {
@@ -120,8 +121,8 @@ public class ActionMethods  {
             }
             catch (Exception e){}
             scrollDown(locator);
-            JavascriptExecutor js = (JavascriptExecutor) driverObj;
-            js.executeScript("arguments[0].click();", driverObj.findElement(findBy(locator)));
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", driver.findElement(findBy(locator)));
         } catch (Exception e) {
             logger.error("Failed to Click on Element - " + locator + e.getMessage());
             throw e;
@@ -129,19 +130,19 @@ public class ActionMethods  {
     }
 
     public int getXcoordinate(By locator) throws Exception {
-        Point p = driverObj.findElement(findBy(locator)).getLocation();
+        Point p = driver.findElement(findBy(locator)).getLocation();
         return p.getX();
     }
 
     public int getYcoordinate(By locator) throws Exception {
-        Point p = driverObj.findElement(findBy(locator)).getLocation();
+        Point p = driver.findElement(findBy(locator)).getLocation();
         return p.getY();
     }
 
     public void waitAndClickWithJavaScriptExecutor(WebElement locator) throws Exception {
         try {
             scrollDown(locator);
-            JavascriptExecutor js = (JavascriptExecutor) driverObj;
+            JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("arguments[0].click();", locator);
         } catch (Exception e) {
             logger.error("Failed to Click on Element - " +e.getMessage());
@@ -149,20 +150,20 @@ public class ActionMethods  {
         }
     }
     public void scrollDown(By locator) throws Exception{
-        JavascriptExecutor js = (JavascriptExecutor) driverObj;
-        js.executeScript("arguments[0].scrollIntoView(true);", driverObj.findElement(this.findBy(locator)));
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].scrollIntoView(true);", driver.findElement(this.findBy(locator)));
 
     }
 
     public void scrollDown(WebElement locator) throws Exception{
-        JavascriptExecutor js = (JavascriptExecutor) driverObj;
+        JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].scrollIntoView();", locator);
 
     }
 
     public void fireChangeEvent(By locator) throws Exception {
-        JavascriptExecutor js = (JavascriptExecutor) driverObj;
-        js.executeScript("$(arguments[0]).change();", driverObj.findElement(this.findBy(locator)));
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("$(arguments[0]).change();", driver.findElement(this.findBy(locator)));
     }
 
 
@@ -170,7 +171,7 @@ public class ActionMethods  {
         WebElement element;
         try {
             logger.info("Started clickRadioButton method execution");
-            element = driverObj.findElement(this.findBy(locator));
+            element = driver.findElement(this.findBy(locator));
             if(!element.isSelected()) {
                 element.click();
                 logger.info("Successfully Clicked on Radio Button - " + locator);
@@ -184,7 +185,7 @@ public class ActionMethods  {
 
     public void uncheckCheckbox(By locator) throws Exception {
         logger.info("Started uncheckCheckbox method execution");
-        WebElement element = driverObj.findElement(this.findBy(locator));
+        WebElement element = driver.findElement(this.findBy(locator));
         try {
             if (element.getAttribute("checked") != null) {
                 element.click();
@@ -199,7 +200,7 @@ public class ActionMethods  {
 
     public void checkCheckbox(By locator) throws Exception {
         logger.info("Started checkCheckbox method execution");
-        WebElement element = driverObj.findElement(this.findBy(locator));
+        WebElement element = driver.findElement(this.findBy(locator));
         try {
             if (element.getAttribute("checked") == null) {
                 waitAndClickWithJavaScriptExecutor(locator);
@@ -216,7 +217,7 @@ public class ActionMethods  {
     public boolean isVerticalScrollBarDisplayed() throws Exception {
         try {
             logger.info("Started isVerticalScrollBarDisplayed method execution");
-            JavascriptExecutor javascript = (JavascriptExecutor) driverObj;
+            JavascriptExecutor javascript = (JavascriptExecutor) driver;
             boolean VertscrollStatus = (boolean) javascript.executeScript("return document.documentElement.scrollHeight>document.documentElement.clientHeight;");
             logger.info("isVerticalScrollBarDisplayed method execution completed");
             return VertscrollStatus;
@@ -244,7 +245,7 @@ public class ActionMethods  {
         try {
             logger.info("Started enterValue method execution");
             waitForVisibilityOfElement(locator);
-            driverObj.findElement(locator).sendKeys(keys);
+            driver.findElement(locator).sendKeys(keys);
             logger.info("Successfully Entered" + keys + "in Textbox - " + locator);
         } catch (Exception e) {
             logger.error("Failed to find Element - " + locator + "in enterValue method" + e.getMessage());
@@ -255,7 +256,7 @@ public class ActionMethods  {
     public WebElement webElement(By locator) throws Exception{
         try {
             waitForVisibilityOfElement(locator);
-            return driverObj.findElement(locator);
+            return driver.findElement(locator);
             } catch (Exception e) {
         logger.error("Failed to find Element - " + locator + "in enterValue method" + e.getMessage());
         throw e;
@@ -264,7 +265,7 @@ public class ActionMethods  {
 
     public void waitForVisibilityOfElement(By locator) throws Exception {
         logger.info("Started waitForVisibilityOfElement method execution");
-        FluentWait<WebDriver> wait = new FluentWait<>(driverObj)
+        FluentWait<WebDriver> wait = new FluentWait<>(driver)
                 .withTimeout(10, TimeUnit.SECONDS)
                 .pollingEvery(200, TimeUnit.MILLISECONDS)
                 .ignoring(NoSuchElementException.class);
@@ -279,7 +280,7 @@ public class ActionMethods  {
 
     public void waitForVisibilityOfElement(By locator,int timeinSec) throws Exception {
         logger.info("Started waitForVisibilityOfElement method execution");
-        FluentWait<WebDriver> wait = new FluentWait<>(driverObj)
+        FluentWait<WebDriver> wait = new FluentWait<>(driver)
                 .withTimeout(timeinSec, TimeUnit.SECONDS)
                 .pollingEvery(200, TimeUnit.MILLISECONDS)
                 .ignoring(NoSuchElementException.class);
@@ -294,7 +295,7 @@ public class ActionMethods  {
 
     public void waitForPresenceOfElement(By locator,int timeinSec) throws Exception {
         logger.info("Started waitForVisibilityOfElement method execution");
-        FluentWait<WebDriver> wait = new FluentWait<>(driverObj)
+        FluentWait<WebDriver> wait = new FluentWait<>(driver)
                 .withTimeout(timeinSec, TimeUnit.SECONDS)
                 .pollingEvery(200, TimeUnit.MILLISECONDS)
                 .ignoring(NoSuchElementException.class);
@@ -309,7 +310,7 @@ public class ActionMethods  {
 
     public void waitForElementToBeClickable(By locator) throws Exception {
         logger.info("Started waitForVisibilityOfElement method execution");
-        FluentWait<WebDriver> wait = new FluentWait<>(driverObj)
+        FluentWait<WebDriver> wait = new FluentWait<>(driver)
                 .withTimeout(50, TimeUnit.SECONDS)
                 .pollingEvery(200, TimeUnit.MILLISECONDS)
                 .ignoring(NoSuchElementException.class);
@@ -343,7 +344,7 @@ public class ActionMethods  {
     public boolean isElementDisplayed(By locator) {
         try {
             waitForVisibilityOfElement(locator,30);
-            return driverObj.findElement(this.findBy(locator)).isDisplayed();
+            return driver.findElement(this.findBy(locator)).isDisplayed();
         } catch (Exception e) {
             logger.error("Failed to identify Element - " + locator + e.getMessage());
             return false;
@@ -351,19 +352,19 @@ public class ActionMethods  {
     }
     public boolean isElementDisplayed1(By locator) {
         try {
-            driverObj.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-            return driverObj.findElement(this.findBy(locator)).isDisplayed();
+            driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+            return driver.findElement(this.findBy(locator)).isDisplayed();
         }catch(Exception e) {
             return false;
         } finally {
-            driverObj.manage().timeouts().implicitlyWait(90, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(90, TimeUnit.SECONDS);
         }
     }
 
     public void clearTextBox(By locator) throws Exception {
         try {
             logger.info("Started clearTextBox method execution");
-            driverObj.findElement(findBy(locator)).clear();
+            driver.findElement(findBy(locator)).clear();
             logger.info("Successfully Cleared value from Text box - " + locator);
         } catch (Exception e) {
             logger.error("failed to find the element - " + locator + e.getMessage());
@@ -411,7 +412,7 @@ public class ActionMethods  {
         };
         try {
             Thread.sleep(sleepTimeInMilliSeconds);
-            WebDriverWait wait = new WebDriverWait(driverObj, timeoutInSeconds);
+            WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
             wait.until(expectation);
             logger.info("Completed waitForPageLoad method execution");
         } catch (Exception e) {
@@ -423,8 +424,8 @@ public class ActionMethods  {
     public void moveToElement(By locator) throws Exception {
         try {
             logger.info("Started moveToElement method execution");
-            Actions mouse = new Actions(driverObj);
-            mouse.moveToElement(driverObj.findElement(this.findBy(locator))).perform();
+            Actions mouse = new Actions(driver);
+            mouse.moveToElement(driver.findElement(this.findBy(locator))).perform();
             logger.info("Successfully moved to Element - " + locator);
         } catch (Exception e) {
             logger.error("Failed to move to Element - " + locator + e.getMessage());
@@ -433,8 +434,8 @@ public class ActionMethods  {
     }
 
     public void moveToElementAndClick(int x, int y) throws Exception {
-        Actions actions = new Actions(driverObj);
-        actions.moveToElement(driverObj.findElement(By.tagName("body")), 0, 0);
+        Actions actions = new Actions(driver);
+        actions.moveToElement(driver.findElement(By.tagName("body")), 0, 0);
         actions.moveByOffset(x,y).click().build().perform();
     }
 
@@ -442,7 +443,7 @@ public class ActionMethods  {
         try {
             logger.info("Started moveToElementAndClick method execution");
             moveToElement(locator);
-            new Actions(driverObj).click();
+            new Actions(driver).click();
             logger.info("Successfully moved and clicked Element - " + locator);
         } catch (Exception e) {
             logger.error("Failed to move to Element - " + locator + e.getMessage());
@@ -453,7 +454,7 @@ public class ActionMethods  {
     public void clickOnLinkText(String str) throws Exception {
         try {
             logger.info("Started clickOnLinkText method execution");
-            WebElement element = driverObj.findElement(By.linkText(str));
+            WebElement element = driver.findElement(By.linkText(str));
             if (element.isDisplayed())
                 element.click();
             else
@@ -470,13 +471,13 @@ public class ActionMethods  {
         try {
             logger.info("Started clickAndSwitchToWindow method execution");
             long sleepTimeInMilliSeconds = 5000;
-            winHandleBefore = driverObj.getWindowHandle();
+            winHandleBefore = driver.getWindowHandle();
             waitAndClick(locator);
             Thread.sleep(sleepTimeInMilliSeconds);
-            Set<String> windows = driverObj.getWindowHandles();
+            Set<String> windows = driver.getWindowHandles();
             for (String winHandle : windows) {
                 if(!winHandle.equals(winHandleBefore)) {
-                    driverObj.switchTo().window(winHandle);
+                    driver.switchTo().window(winHandle);
                 }
             }
             logger.info("Successfully Clicked on element - " + locator + "and Switched to window");
@@ -490,8 +491,8 @@ public class ActionMethods  {
     public void closeCurrentWindow() throws Exception {
         try {
             logger.info("closeCurrentWindow method execution started");
-            int countWindows= driverObj.getWindowHandles().size();
-            driverObj.close();
+            int countWindows= driver.getWindowHandles().size();
+            driver.close();
             waitForWindowCountToBe(countWindows-1);
             logger.info("closeCurrentWindow method execution completed");
         } catch (Exception e) {
@@ -505,11 +506,11 @@ public class ActionMethods  {
         try {
             logger.info("Started switchToWindow method execution");
             Thread.sleep(20000);
-            Set<String> winHandles = driverObj.getWindowHandles();
+            Set<String> winHandles = driver.getWindowHandles();
             boolean isSwitched = false;
             for (String winHandle : winHandles) {
-                driverObj.switchTo().window(winHandle);
-                String title = driverObj.getTitle();
+                driver.switchTo().window(winHandle);
+                String title = driver.getTitle();
                 if (title.equals(windowTitle)) {
                     logger.info("successfully switched to the window: " + windowTitle);
                     isSwitched = true;
@@ -529,11 +530,11 @@ public class ActionMethods  {
     public void switchToWindowAndClose(String windowTitle) throws Exception {
         try {
             logger.info("Started switchToWindowAndClose method execution");
-            Set<String> windows = driverObj.getWindowHandles();
+            Set<String> windows = driver.getWindowHandles();
             for (String winHandle : windows) {
-                driverObj.switchTo().window(winHandle);
-                if (driverObj.getTitle().contains(windowTitle)) {
-                    driverObj.close();
+                driver.switchTo().window(winHandle);
+                if (driver.getTitle().contains(windowTitle)) {
+                    driver.close();
                     break;
                 }
             }
@@ -547,7 +548,7 @@ public class ActionMethods  {
     public void switchToFrame() throws Exception {
         try {
             logger.info("Started switchToFrame method execution");
-            driverObj.switchTo().activeElement();
+            driver.switchTo().activeElement();
             logger.info("Successfully switched to frame");
         } catch (Exception e) {
             logger.error("Failed to switched to window and closeCurrentWindow - " + e.getMessage());
@@ -558,8 +559,8 @@ public class ActionMethods  {
     public void switchToFrameByID(By locator) throws Exception {
         try {
             logger.info("Started switchToFrame method execution");
-            WebElement fr = driverObj.findElement(findBy(locator));
-            driverObj.switchTo().frame(fr);
+            WebElement fr = driver.findElement(findBy(locator));
+            driver.switchTo().frame(fr);
             logger.info("Successfully switched to frame");
         } catch (Exception e) {
             logger.error("Failed to switched to window and closeCurrentWindow - " + e.getMessage());
@@ -570,7 +571,7 @@ public class ActionMethods  {
     public void switchToActiveElement() throws Exception {
         try {
             logger.info("Started switchToFrame method execution");
-            driverObj.switchTo().activeElement();
+            driver.switchTo().activeElement();
             logger.info("Successfully Activated popup");
         } catch (Exception e) {
             logger.error("Failed to switched to window and closeCurrentWindow - " + e.getMessage());
@@ -581,7 +582,7 @@ public class ActionMethods  {
     public Select findSelect(By locator) throws Exception {
         try {
             logger.info("findSelect method execution started");
-            WebElement listElement = driverObj.findElement(findBy(locator));
+            WebElement listElement = driver.findElement(findBy(locator));
             Select select = new Select(listElement);
             logger.info("findSelect method execution completed");
             return select;
@@ -679,7 +680,7 @@ public class ActionMethods  {
             logger.info("Started getText method execution");
             waitForVisibilityOfElement(locator);
             scrollDown(locator);
-            String elementText = driverObj.findElement(this.findBy(locator)).getText().trim();
+            String elementText = driver.findElement(this.findBy(locator)).getText().trim();
             logger.info("Successfully returned text - " + elementText + " from element " + locator);
             return elementText;
         } catch (Exception e) {
@@ -691,10 +692,10 @@ public class ActionMethods  {
     public String getTextAfterSwitchingToDefaultContent(By locator) throws Exception {
         try {
             logger.info("Started getText method execution");
-            driverObj.switchTo().defaultContent();
+            driver.switchTo().defaultContent();
             Thread.sleep(5000);
             waitForVisibilityOfElement(locator);
-            String elementText = driverObj.findElement(this.findBy(locator)).getText();
+            String elementText = driver.findElement(this.findBy(locator)).getText();
             logger.info("Successfully returned text - " + elementText + " from element " + locator);
             return elementText;
         } catch (Exception e) {
@@ -719,7 +720,7 @@ public class ActionMethods  {
     public void clearAndEnterValue(By locator, String strg) throws Exception {
         try {
             logger.info("Started clearAndEnterValue method execution");
-            WebElement element = driverObj.findElement(this.findBy(locator));
+            WebElement element = driver.findElement(this.findBy(locator));
             element.clear();
             element.sendKeys(strg);
             logger.info("Successfully set text - " + strg + " to element " + locator);
@@ -731,8 +732,8 @@ public class ActionMethods  {
 
     public void setTextUsingJS(By locator, String strg) throws Exception {
         try {
-            WebElement element = driverObj.findElement(this.findBy(locator));
-            JavascriptExecutor js = (JavascriptExecutor) driverObj;
+            WebElement element = driver.findElement(this.findBy(locator));
+            JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("arguments[0].setAttribute('value', '" + strg +"')", element);
 
         } catch (Exception e) {
@@ -743,7 +744,7 @@ public class ActionMethods  {
 
     public String getPageTitle() {
         logger.info("Started getPageTitle method execution");
-        String title = driverObj.getTitle();
+        String title = driver.getTitle();
         logger.info("Successfully returned page title - " + title);
         return title;
     }
@@ -751,7 +752,7 @@ public class ActionMethods  {
     public void acceptAlert() throws Exception {
         try {
             logger.info("Started acceptAlert method execution");
-            Alert alert = driverObj.switchTo().alert();
+            Alert alert = driver.switchTo().alert();
             alert.accept();
             logger.info("Successfully clicked OK on Alert.");
         } catch (Exception e) {
@@ -763,7 +764,7 @@ public class ActionMethods  {
     public String getTextOfAlert() throws Exception {
         try {
             logger.info("Started getTextOfAlert method execution");
-            Alert alert = driverObj.switchTo().alert();
+            Alert alert = driver.switchTo().alert();
             String alertText = alert.getText();
             logger.info("Successfully get alert text - " + alertText);
             return alertText;
@@ -776,7 +777,7 @@ public class ActionMethods  {
     public void switchBackToDefaultWindow() throws Exception {
         try {
             logger.info("Started switchBackToDefaultWindow method execution");
-            driverObj.switchTo().defaultContent();
+            driver.switchTo().defaultContent();
             logger.info("Successfully switched to default content");
         } catch (Exception e) {
             logger.error("Failed to switch to default content - " + e.getMessage());
@@ -787,7 +788,7 @@ public class ActionMethods  {
     public List<WebElement> findElements(By locators) throws Exception {
         try {
             logger.info("Started findElements method execution");
-            return driverObj.findElements(this.findBy(locators));
+            return driver.findElements(this.findBy(locators));
         } catch (Exception e) {
             logger.error("Failed to find elements: " + e.getMessage());
             throw e;
@@ -797,7 +798,7 @@ public class ActionMethods  {
     public void dismissAlert() throws Exception {
         try {
             logger.info("Started closeWindowsSecurityPopup method execution");
-            Alert alert = driverObj.switchTo().alert();
+            Alert alert = driver.switchTo().alert();
             alert.dismiss();
             logger.info("Successfully closed Windows Security Popup");
         } catch (Exception e) {
@@ -810,7 +811,7 @@ public class ActionMethods  {
         try {
             logger.info("Started waitOnlocator method execution");
             long timeoutInSeconds = 50;
-            WebDriverWait wait = new WebDriverWait(driverObj, timeoutInSeconds);
+            WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(this.findBy(locator)));
             if (element != null) {
                 logger.info("Completed waitOnlocator method execution");
@@ -841,7 +842,7 @@ public class ActionMethods  {
     public String getEnteredText(By locator) throws Exception {
         try {
             logger.info("Started getTextEntered method execution");
-            String enteredText = driverObj.findElement(findBy(locator)).getAttribute("value");
+            String enteredText = driver.findElement(findBy(locator)).getAttribute("value");
             logger.info("Successfully retured selected option - " + enteredText + " from " + locator);
             return enteredText;
 
@@ -855,7 +856,7 @@ public class ActionMethods  {
         try {
             logger.info("Started isAlertPresent method execution");
             long timeoutInSeconds = 7;
-            WebDriverWait wait = new WebDriverWait(driverObj, timeoutInSeconds);
+            WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
             wait.until(ExpectedConditions.alertIsPresent());
             return true;
         } catch (Exception e) {
@@ -867,7 +868,7 @@ public class ActionMethods  {
     public String getAttributeValue(By locator, String attributeName) throws Exception {
         try {
             logger.info("Started getAttributeValue method execution");
-            String getAttributeName = driverObj.findElement(this.findBy(locator)).getAttribute(attributeName);
+            String getAttributeName = driver.findElement(this.findBy(locator)).getAttribute(attributeName);
             logger.info("Successfully returned selected option - " + getAttributeName + " from " + locator);
             return getAttributeName;
         } catch (Exception e) {
@@ -879,7 +880,7 @@ public class ActionMethods  {
     public int[] getElementCoordinates(By locator) throws Exception {
         try {
             logger.info("Started getCoordinates method execution");
-            Point coordinate = driverObj.findElement(this.findBy(locator)).getLocation();
+            Point coordinate = driver.findElement(this.findBy(locator)).getLocation();
             int xCordinate = coordinate.getX();
             int yCordinate = coordinate.getY();
             int[] coordinates = new int[2];
@@ -896,7 +897,7 @@ public class ActionMethods  {
     public int[] getElementSize(By locator) throws Exception {
         try {
             logger.info("Started getElementSize method execution");
-            Dimension sizeOfElement = driverObj.findElement(this.findBy(locator)).getSize();
+            Dimension sizeOfElement = driver.findElement(this.findBy(locator)).getSize();
             int[] elementSize = new int[2];
             elementSize[0] = sizeOfElement.getHeight();
             elementSize[1] = sizeOfElement.getWidth();
@@ -912,7 +913,7 @@ public class ActionMethods  {
         logger.info("Started waitForInvisibilityOfElement method execution");
         long timeoutInSeconds = 20;
         long pollingTimeoutInMilliSeconds = 200;
-        FluentWait<WebDriver> wait = new FluentWait<>(driverObj).withTimeout(timeoutInSeconds, TimeUnit.SECONDS).pollingEvery(pollingTimeoutInMilliSeconds, TimeUnit.MILLISECONDS).ignoring(NoSuchElementException.class);
+        FluentWait<WebDriver> wait = new FluentWait<>(driver).withTimeout(timeoutInSeconds, TimeUnit.SECONDS).pollingEvery(pollingTimeoutInMilliSeconds, TimeUnit.MILLISECONDS).ignoring(NoSuchElementException.class);
         try {
             wait.until(ExpectedConditions.invisibilityOfElementLocated(findBy(locator)));
             logger.info("Successfully wait for invisibility of element - " + locator);
@@ -926,7 +927,7 @@ public class ActionMethods  {
     public boolean waitForInvisibilityOfElement(By locator, long timeOut) throws Exception {
         logger.info("Started waitForInvisibilityOfElement method execution");
         try {
-            WebDriverWait wd = new WebDriverWait(driverObj,timeOut);
+            WebDriverWait wd = new WebDriverWait(driver,timeOut);
             wd.until(ExpectedConditions.invisibilityOfElementLocated(findBy(locator)));
             return true;
         } catch (Exception e) {
@@ -938,15 +939,15 @@ public class ActionMethods  {
     public boolean waitForInvisibilityOfElement1(By locator, long timeOut) throws Exception {
         logger.info("Started waitForInvisibilityOfElement method execution");
         try {
-            driverObj.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
-            WebDriverWait wd = new WebDriverWait(driverObj, timeOut);
+            driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+            WebDriverWait wd = new WebDriverWait(driver, timeOut);
             wd.until(ExpectedConditions.invisibilityOfElementLocated(findBy(locator)));
             return true;
         } catch (Exception e) {
             logger.error("Failed to wait on element - " + locator + e.getMessage());
             return false;
         } finally {
-            driverObj.manage().timeouts().implicitlyWait(90, TimeUnit.SECONDS);
+            driver.manage().timeouts().implicitlyWait(90, TimeUnit.SECONDS);
         }
     }
 
@@ -994,7 +995,7 @@ public class ActionMethods  {
 
     public WebElement findElement(By locator) throws Exception {
         try {
-            return driverObj.findElement(this.findBy(locator));
+            return driver.findElement(this.findBy(locator));
         } catch (Exception e) {
             logger.error("findElement method executino failed: " + e.getMessage());
             throw e;
@@ -1005,7 +1006,7 @@ public class ActionMethods  {
     public void triggerChangeEventOnTextbox(By locator) throws Exception {
         try {
             logger.info("Started triggerChangeEventOnTextbox method execution");
-            JavascriptExecutor jsExecutor = (JavascriptExecutor) driverObj;
+            JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
             jsExecutor.executeScript("$(arguments[0]).change();", findElement(locator));
             logger.info("Completed triggerChangeEventOnTextbox method execution");
         } catch (Exception e) {
@@ -1027,7 +1028,7 @@ public class ActionMethods  {
     public void clickUsingJavaScriptExcuter1(By locator) throws Exception {
         try {
             logger.info("Started clickUsingJavaScriptExcuter method execution");
-            JavascriptExecutor jse = (JavascriptExecutor) driverObj;
+            JavascriptExecutor jse = (JavascriptExecutor) driver;
             jse.executeScript("arguments[0].click();", findElement(locator));
             logger.info("Successfully clicked on element");
         } catch (Exception e) {
@@ -1040,7 +1041,7 @@ public class ActionMethods  {
         try {
             logger.info("Started isAlertPresent method execution");
             long timeoutInSeconds = 50;
-            WebDriverWait wait = new WebDriverWait(driverObj, timeoutInSeconds);
+            WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
             wait.until(ExpectedConditions.alertIsPresent());
             return true;
         } catch (Exception e) {
@@ -1054,7 +1055,7 @@ public class ActionMethods  {
         try {
             logger.info("Started isAlertPresent method execution");
             long timeoutInSeconds = 50;
-            WebDriverWait wait = new WebDriverWait(driverObj, timeoutInSeconds);
+            WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
             wait.until(ExpectedConditions.numberOfWindowsToBe(count));
             return true;
         } catch (Exception e) {
@@ -1067,12 +1068,12 @@ public class ActionMethods  {
     public void switchToWindowS(String windowTitle) throws Exception {
         try {
             logger.info("Started switchToWindow method execution");
-            String windowHandle = driverObj.getWindowHandle();
-            Set<String> winHandles = driverObj.getWindowHandles();
+            String windowHandle = driver.getWindowHandle();
+            Set<String> winHandles = driver.getWindowHandles();
             winHandles.remove(windowHandle);
             for (String winHandle : winHandles) {
-                driverObj.switchTo().window(winHandle);
-                if (driverObj.getTitle().contains(windowTitle))
+                driver.switchTo().window(winHandle);
+                if (driver.getTitle().contains(windowTitle))
                     break;
             }
             logger.info("Successfully Switched to window - " + windowTitle);
@@ -1086,7 +1087,7 @@ public class ActionMethods  {
         logger.info("Started waitForInvisibilityOfElement method execution");
         long timeoutInSeconds = 50;
         long pollingTimeoutInMilliSeconds = 300;
-        FluentWait<WebDriver> wait = new FluentWait<>(driverObj).withTimeout(timeoutInSeconds, TimeUnit.SECONDS).pollingEvery(pollingTimeoutInMilliSeconds, TimeUnit.MILLISECONDS).ignoring(NoSuchElementException.class);
+        FluentWait<WebDriver> wait = new FluentWait<>(driver).withTimeout(timeoutInSeconds, TimeUnit.SECONDS).pollingEvery(pollingTimeoutInMilliSeconds, TimeUnit.MILLISECONDS).ignoring(NoSuchElementException.class);
         try {
             wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(findBy(locator)));
             logger.info("Successfully wait for invisibility of element - " + locator);
@@ -1108,7 +1109,7 @@ public class ActionMethods  {
 
     public String getPageUrl() throws Exception {
         try {
-            return driverObj.getCurrentUrl();
+            return driver.getCurrentUrl();
         } catch (Exception e) {
             logger.error("getPageUrl method execution failed: "+ e.getMessage());
             throw  e;
@@ -1119,7 +1120,7 @@ public class ActionMethods  {
         logger.info("Started waitForInvisibilityOfElement method execution");
         long timeoutInSeconds = 50;
         long pollingTimeoutInMilliSeconds = 300;
-        FluentWait<WebDriver> wait = new FluentWait<>(driverObj).withTimeout(timeoutInSeconds, TimeUnit.SECONDS).pollingEvery(pollingTimeoutInMilliSeconds, TimeUnit.MILLISECONDS).ignoring(NoSuchElementException.class);
+        FluentWait<WebDriver> wait = new FluentWait<>(driver).withTimeout(timeoutInSeconds, TimeUnit.SECONDS).pollingEvery(pollingTimeoutInMilliSeconds, TimeUnit.MILLISECONDS).ignoring(NoSuchElementException.class);
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(findBy(locator)));
             logger.info("Successfully wait for invisibility of element - " + locator);
@@ -1133,7 +1134,7 @@ public class ActionMethods  {
 
     public void captureScreenshot (Scenario scenario,String udid){
         try {
-                byte[] exception = (byte[]) ((TakesScreenshot) driverObj).getScreenshotAs(OutputType.BYTES);
+                byte[] exception = (byte[]) ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
                 scenario.embed(exception, "image/jpeg");
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -1141,7 +1142,7 @@ public class ActionMethods  {
     }
 
     public List<Object> captureXYCoordinatesOfEndCallBtn(){
-        Point p = driverObj.findElement(By.xpath("(//label[text()='中断']//preceding::button)[5]")).getLocation();
+        Point p = driver.findElement(By.xpath("(//label[text()='中断']//preceding::button)[5]")).getLocation();
         int x_coordinate = p.getX();
         int y_coordinate = p.getY();
         ArrayList<Object> al = new ArrayList<Object>();
@@ -1151,16 +1152,16 @@ public class ActionMethods  {
     }
 
     public void performClickOperation(int x, int y) {
-        new Actions(driverObj).moveByOffset(x, y).click().build().perform();
+        new Actions(driver).moveByOffset(x, y).click().build().perform();
     }
     public void openNewWindowInWeb(String windowUrl) throws Exception {
-        JavascriptExecutor js = (JavascriptExecutor) driverObj;
+        JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("window.open('"+windowUrl+"')");
     }
 
     public void switchToDefaultWindow(){
-        driverObj.switchTo().window(winHandleBefore);
-        driverObj.switchTo().defaultContent();
+        driver.switchTo().window(winHandleBefore);
+        driver.switchTo().defaultContent();
     }
 
 }
