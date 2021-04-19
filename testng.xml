@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite" parallel="tests" thread-count="1">
+  <test name="Test1">
+    <parameter name="browser" value="chrome"></parameter>
+    <parameter name="version" value="NA"></parameter>
+    <parameter name="udid" value="NA"></parameter>
+    <parameter name="port" value="NA"></parameter>
+    <parameter name="env" value="facebook"></parameter>
+    <parameter name="deviceName" value="NA"></parameter>
+    <parameter name="systemPort" value="4731"></parameter>
+    <parameter name="chromedriverPort" value="8000"></parameter>
+
+    <parameter name="glue" value="com.stepdefination,com.pages"></parameter>
+    <parameter name="monochrome" value="--monochrome"></parameter>
+    <parameter name="strict" value="--strict"></parameter>
+    <parameter name="dryRun" value="--no-dry-run"></parameter>
+    <parameter name="plugin" value="--plugin,json:target/cucumberDefault.json,--plugin, rerun:target/rerun.txt"></parameter>
+
+    <parameter name="applicationName" value="facebook"></parameter>
+    <parameter name="tags" value="@login1"></parameter>
+    <classes>
+      <class name="com.base.RunnerTest"/>
+    </classes>
+  </test>
+</suite>

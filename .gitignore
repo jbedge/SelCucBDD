@@ -1,0 +1,6 @@
+/target/
+*.js
+*.css
+.idea/vcs.xml
+.idea/SeleniumCucumber.iml
+.idea/
