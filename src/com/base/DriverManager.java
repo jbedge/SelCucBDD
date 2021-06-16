@@ -52,7 +52,7 @@ public class DriverManager extends TestConfiguration {
 //                chrome.exe -remote-debugging-port=9222 -user-data-dir=C:\ChromeData :command to run chrome in debugmode
                 options1.addArguments();
                 driver = new ChromeDriver(options1);
-                driver.manage().timeouts().implicitlyWait(20,TimeUnit.SECONDS);
+                driver.manage().timeouts().implicitlyWait(10,TimeUnit.SECONDS);
                 driver.manage().timeouts().pageLoadTimeout(10,TimeUnit.SECONDS);
                 break;
             case "ie":

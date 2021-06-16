@@ -30,6 +30,7 @@ import java.util.List;
         private String executeTags;
 
 
+
     private String plugin;
     private String glue;
     private String monochrome;
@@ -282,9 +283,9 @@ import java.util.List;
             try {
                 //Adding tag name to the Reports folder name in case there is a single tag.
                 String tags = Reporter.getCurrentTestResult().getTestContext().getCurrentXmlTest().getParameter("tags");
-                String folderName = "./Reports_";
+                String folderName = ".Results/Reports_";
                 if (tags.split(",").length == 1) {
-                    folderName = "./Reports_" + tags.replace("@", "") + "_";
+                    folderName = ".Results/Reports_" + tags.replace("@", "") + "_";
                 }
                 //=======================================================================
                 File rd = new File(folderName + dateString + "/Result_" + reportsDir);
